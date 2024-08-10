@@ -23,10 +23,10 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_subnet" "private" {
-  count             = length(var.private_subnet_cidr_blocks)
-  vpc_id            = aws_vpc.solar_system_vpc.id
-  cidr_block        = var.private_subnet_cidr_blocks[count.index]
-  availability_zone = data.aws_availability_zones.available.names[count.index]
+  count                   = length(var.private_subnet_cidr_blocks)
+  vpc_id                  = aws_vpc.solar_system_vpc.id
+  cidr_block              = var.private_subnet_cidr_blocks[count.index]
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = false
   tags = {
     Name = "Solar-System-Cluster-Private-${count.index}"
@@ -50,8 +50,8 @@ resource "aws_subnet" "private" {
 # }
 
 resource "aws_route_table" "public_route_table" {
-vpc_id = aws_vpc.solar_system_vpc.id
-route {
+  vpc_id = aws_vpc.solar_system_vpc.id
+  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
@@ -59,8 +59,8 @@ route {
 }
 
 resource "aws_route_table" "private_route_table" {
-vpc_id = aws_vpc.solar_system_vpc.id
-route {
+  vpc_id = aws_vpc.solar_system_vpc.id
+  route {
     cidr_block = "0.0.0.0/0"
     # gateway_id = aws_nat_gateway.nat.id
     gateway_id = aws_internet_gateway.gw.id
@@ -84,12 +84,12 @@ resource "aws_security_group" "eks_cluster_security_group" {
   name        = "Solar-System-Cluster-SG"
   description = "Security group for EKS cluster"
   vpc_id      = aws_vpc.solar_system_vpc.id
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Consider restricting for production
-  }
+  # ingress {
+  #   from_port   = 443
+  #   to_port     = 443
+  #   protocol    = "tcp"
+  #   cidr_blocks = ["0.0.0.0/0"] # Consider restricting for production
+  # }
   ingress = [
     {
       description      = "HTTPS from VPC"
@@ -158,12 +158,12 @@ resource "aws_security_group" "eks_cluster_security_group" {
 
 # EKS Cluster
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "~> 18.0"
-  cluster_name           = var.eks_cluster_name
-  cluster_version        = "1.30"
-  vpc_id                 = aws_vpc.solar_system_vpc.id
-  subnet_ids             = aws_subnet.private.*.id
+  source          = "terraform-aws-modules/eks/aws"
+  version         = "~> 18.0"
+  cluster_name    = var.eks_cluster_name
+  cluster_version = "1.30"
+  vpc_id          = aws_vpc.solar_system_vpc.id
+  subnet_ids      = aws_subnet.private.*.id
   eks_managed_node_group_defaults = {
     ami_type = "AL2_x86_64"
   }
