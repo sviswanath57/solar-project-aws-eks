@@ -2,7 +2,7 @@
 resource "aws_vpc" "solar_system_vpc" {
   cidr_block = var.vpc_cidr
   tags = {
-    Name = "Solar-System-Cluster-VPC"
+    Name = "Solar-System-Cluster-VPC1"
   }
 }
 
